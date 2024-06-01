@@ -3,6 +3,7 @@ from scipy import sparse
 from scipy.sparse import csr_matrix, random
 from scipy import stats
 import time
+import matplotlib.pyplot as plt
 
 
 def sparse_pearson_correlation_1_on_1(matrix1, matrix2):
@@ -63,13 +64,13 @@ def sparse_pearson_correlation_N_on_N(matrix1, matrix2):
 
     return correlation
 
+def test(side1, side2, density):
+    print(f"=== Side1: {side1}; Side2: {side2}; Density: {density} ===")
 
-if __name__ == "__main__":
-    break_pt = 100
-    a = random(break_pt, 100000, density=0.1, format='csr',
+    a = random(side1, side2, density=density, format='csr',
                data_rvs=stats.randint(1, 2).rvs)
     a.data = np.ones_like(a.data)
-    b = random(break_pt, 100000, density=0.1, format='csr',
+    b = random(side1, side2, density=density, format='csr',
                data_rvs=stats.randint(1, 2).rvs)
     b.data = np.ones_like(b.data)
 
@@ -78,9 +79,9 @@ if __name__ == "__main__":
     coeffs1 = sparse_pearson_correlation_N_on_N(a, b)
 
     t2 = time.time()
-    coeffs2 = np.zeros((break_pt, break_pt))
-    for ind1 in range(break_pt):
-        for ind2 in range(break_pt):
+    coeffs2 = np.zeros((side1, side1))
+    for ind1 in range(side1):
+        for ind2 in range(side1):
             corr = np.corrcoef(a[ind1, :].toarray().flatten(),
                                b[ind2, :].toarray().flatten())[0, 1]
             coeffs2[ind1, ind2] = corr
@@ -90,3 +91,43 @@ if __name__ == "__main__":
     print(f"usual:{t3-t2}")
 
     print(np.allclose(coeffs1, coeffs2))
+
+    return t2-t1, t3-t2
+
+
+if __name__ == "__main__":
+    densitylst = np.logspace(-4, -1, num=20)
+    time_record = []
+    for density in densitylst:
+        sparse_time, np_time = test(side1=100, side2=100000, density=density)
+        time_record.append([sparse_time, np_time])
+    time_record = np.array(time_record)
+
+    plt.figure()
+    plt.plot(densitylst, time_record[:,0], "-o", label="sparse correlation")
+    plt.plot(densitylst, time_record[:,1], "-o", label="numpy correlation")
+    plt.xlabel("Density")
+    plt.ylabel("Time")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.legend()
+    plt.savefig("density_test.png")
+
+    side1lst = np.logspace(np.log10(10), np.log10(1000), num=20)
+    time_record = []
+    for side1 in side1lst:
+        sparse_time, np_time = test(side1=int(side1), side2=100000, density=0.01)
+        time_record.append([sparse_time, np_time])
+    time_record = np.array(time_record)
+
+    plt.figure()
+    plt.plot(side1lst, time_record[:,0], "-o", label="sparse correlation")
+    plt.plot(side1lst, time_record[:,1], "-o", label="numpy correlation")
+    plt.xlabel("Short Side Length")
+    plt.ylabel("Time")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.legend()
+    plt.savefig("side1_test.png")
+
+

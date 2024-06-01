@@ -56,7 +56,7 @@ class big_array:
 
         # A=np.memmap('big_matrix.dat', dtype=np.int32,mode='w+',shape=(rows,cols))
         # A[:]=np.random.random((rows,cols))
-        A = load_npz("../microns_allW.npz")
+        A = load_npz("microns_allW.npz")
         print(f"Density:{np.sum(A)/(A.shape[0]**2)}")
         print(A.data.nbytes/(1024*1024*1024))
         rows, cols = A.shape[0], A.shape[1]
@@ -113,7 +113,7 @@ class big_array:
                 # print(dot-test)
 
                 B[i:i+break_pt, j:j+break_pt] = dot
-                # print(dot)
+                
             ptime += tick.elapsed
             print(f'needs ({tick.elapsed}) secs.')
 
@@ -133,9 +133,10 @@ class big_array:
 
 
 if __name__ == '__main__':
-    search_index = "column"
+    search_index = "row"
     ba = big_array(search_index)
     ba.run()
+
     # corr_W = np.fromfile('corr_W.dat', dtype=np.float64)
     # corr_W = corr_W.reshape(int(np.sqrt(corr_W.shape[0])), int(np.sqrt(corr_W.shape[0])))
     # print(corr_W)
