@@ -4,7 +4,10 @@ We provide a paradigm for conducting pairwise row operations (e.g., Pearson corr
 
 Through tests in generating random sparse matrices, it is clear that our sparse correlation consistently has better time performance than the `numpy` counterpart for larger matrices. Still, it is recommended to truncate the matrix into smaller blocks (e.g., 100×N) and calculate each separately, either synchronously or asynchronously. It is recommanded to use `np.memmap()` to create memory-map for data storage. 
 
-<img src="./images/side1_test.png" alt="Test comparison in varying dimensions" width="300"/>
+<p align="center">
+<img src="./images/side1_test.png" alt="Test comparison in varying dimensions"/>
+</p>
 
-![Test comparison in varying densities](./images/density_test.png)
-
+<p align="center">
+<img src="./images/density_test.png" alt="Test comparison in varying densities"/>
+</p>
